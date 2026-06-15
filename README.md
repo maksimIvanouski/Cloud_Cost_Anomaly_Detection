@@ -415,9 +415,9 @@ The core project works fully without Streamlit.
 cloud-cost-anomaly-detection/
 ├── data/
 │   ├── raw/
-│   │   └── cloud_cost_data.csv
+│   │   └── cloud_cost_data.csv (ignored)
 │   ├── processed/
-│   │   └── cloud_cost_features.csv
+│   │   └── cloud_cost_features.csv (ignored)
 │   └── README.md
 ├── src/
 │   ├── data_generation.py
@@ -432,14 +432,13 @@ cloud-cost-anomaly-detection/
 │   └── utils.py
 ├── models/
 │   ├── README.md
-│   └── *.pkl
+│   └── *.pkl (ignored)
 ├── assets/
 │   ├── plots/
 │   ├── screenshots/
 │   └── architecture/
 ├── reports/
-│   ├── report_pl.md
-│   └── presentation_outline_pl.md
+│   └── report_pl.md
 ├── requirements.txt
 ├── README.md
 ├── Dockerfile
