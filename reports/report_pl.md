@@ -1,6 +1,6 @@
 # Wykrywanie anomalii w kosztach chmury z wykorzystaniem uczenia maszynowego
 
-**Autorzy:** Student 1, Student 2, Student 3
+**Autorzy:** Maksim Ivanouski
 
 **Data:** Czerwiec 2025
 
@@ -25,7 +25,7 @@ Istotne jest, że wysokie koszty nie zawsze oznaczają anomalię — koszt 900 U
 
 ### 3.1. Charakterystyka zbioru danych
 
-Wykorzystano syntetyczny zbiór danych symulujący dzienne koszty infrastruktury chmurowej. Zbiór zawiera około 5000 rekordów z 20 kolumnami, obejmującymi:
+Wykorzystano syntetyczny zbiór danych symulujący dzienne koszty infrastruktury chmurowej. Zbiór zawiera **5040 rekordów** z **20 kolumnami**. Dane obejmują **90 dni** dziennych kosztów, od **1 stycznia 2025** do **31 marca 2025**. W każdym dniu generowanych jest **56 rekordów**, a dane obejmują 3 dostawców chmury, 4 regiony, 7 usług oraz 3 typy środowisk. Zbiór obejmuje:
 
 - **Cechy temporalne** — dzień tygodnia, weekend, miesiąc
 - **Cechy infrastrukturalne** — dostawca chmury (AWS, Azure, Google Cloud), region (us-east-1, eu-central-1, eu-west-1, us-west-2), usługa (EC2, S3, RDS, Lambda, CloudWatch, Data Transfer, Kubernetes), środowisko (production, staging, development)
@@ -35,7 +35,7 @@ Wykorzystano syntetyczny zbiór danych symulujący dzienne koszty infrastruktury
 
 ### 3.2. Anomalie
 
-Anomalie stanowią ~7% rekordów, co odzwierciedla naturalną nierównowagę klas typową dla zadań wykrywania anomalii. Zdefiniowano 8 typów anomalii:
+Anomalie stanowią **352 z 5040 rekordów**, czyli około **7,0%** zbioru. Jest to naturalna nierównowaga klas typowa dla zadań wykrywania anomalii. Zdefiniowano 8 typów anomalii, po około **44 rekordy** dla każdego typu:
 
 | Typ anomalii | Opis |
 |---|---|
@@ -78,7 +78,7 @@ Pipeline projektu obejmuje następujące etapy:
 
 ### 5.1. Baseline — Klasyfikator klasy większościowej
 
-Model zawsze przewiduje klasę dominującą (normalny koszt). Osiąga wysoką dokładność (~93%), ale wykrywa zero anomalii (recall = 0). Demonstruje to tzw. „pułapkę dokładności" (*accuracy trap*) — wysoka wartość metryki accuracy nie oznacza użytecznego modelu w kontekście wykrywania anomalii.
+Model zawsze przewiduje klasę dominującą (normalny koszt). Osiąga dokładność **0,9306**, ale wykrywa zero anomalii (**recall = 0,0000**). Demonstruje to tzw. „pułapkę dokładności" (*accuracy trap*) — wysoka wartość metryki accuracy nie oznacza użytecznego modelu w kontekście wykrywania anomalii.
 
 ### 5.2. Regresja Logistyczna
 
@@ -100,16 +100,16 @@ Model nienadzorowany — nie wykorzystuje etykiet podczas trenowania. Identyfiku
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
-| Baseline (klasa większościowa) | ~0.93 | 0.00 | 0.00 | 0.00 | 0.50 |
-| Regresja Logistyczna | ~ | ~ | ~ | ~ | ~ |
-| Las Losowy | ~ | ~ | ~ | ~ | ~ |
-| Las Izolacyjny | ~ | ~ | ~ | ~ | ~ |
+| Baseline (klasa większościowa) | 0.9306 | 0.0000 | 0.0000 | 0.0000 | 0.5000 |
+| Regresja Logistyczna | 0.9772 | 0.7765 | 0.9429 | 0.8516 | 0.9730 |
+| Las Losowy | 0.9841 | 0.8857 | 0.8857 | 0.8857 | 0.9863 |
+| Las Izolacyjny | 0.9365 | 0.5405 | 0.5714 | 0.5556 | N/A |
 
-*Uwaga: dokładne wartości zostaną uzupełnione po uruchomieniu pipeline'u z ziarnem losowości RANDOM_STATE=67.*
+Najlepszy wynik osiągnął **Las Losowy**, uzyskując **F1 = 0.8857** oraz **ROC-AUC = 0.9863** na zbiorze testowym.
 
 ### 6.2. Dlaczego accuracy nie wystarczy
 
-Przy ~7% anomalii model przewidujący zawsze „normalny" osiąga ~93% accuracy, ale ma zerowy recall — nie wykrywa żadnej anomalii. Model jest bezużyteczny pomimo wysokiej dokładności. Dlatego kluczowe metryki to:
+Przy około **7% anomalii** model przewidujący zawsze „normalny" osiąga **0.9306 accuracy**, ale ma zerowy recall — nie wykrywa żadnej anomalii. Model jest bezużyteczny pomimo wysokiej dokładności. Dlatego kluczowe metryki to:
 
 - **F1-score** — harmoniczna średnia precyzji i czułości
 - **Recall** — jaki odsetek rzeczywistych anomalii został wykryty
@@ -139,7 +139,7 @@ Na podstawie rankingu ważności cech modelu Las Losowy zidentyfikowano następu
 6. `resource_count` — liczba aktywnych zasobów
 7. `cost_per_resource` — koszt na zasób
 
-Cechy trendowe (stosunek kosztu do średniej kroczącej) okazały się kluczowe — potwierdzają, że anomalie wykrywane są nie przez sam poziom kosztu, lecz przez **odchylenie od wzorca historycznego**.
+Cechy trendowe (stosunek kosztu do średniej kroczącej) okazały się kluczowe — potwierdzają, że anomalie wykrywane są nie przez sam poziom kosztu, lecz przez **odchylenie od wzorca historycznego**. W repozytorium wygenerowano również wizualizacje wspierające interpretację wyników: rozkład klas, rozkład typów anomalii, macierze pomyłek dla modeli, krzywe ROC i precision-recall, ranking ważności cech oraz porównanie modeli.
 
 ### 7.2. Studium przypadku
 
@@ -175,10 +175,11 @@ System mógłby funkcjonować w środowisku produkcyjnym firmy według następuj
 ## 9. Wnioski
 
 1. **Uczenie maszynowe skutecznie wspiera wykrywanie anomalii kosztowych** w infrastrukturze chmurowej, przewyższając podejścia oparte na prostych progach.
-2. **Las Losowy osiągnął najlepszy balans** między precyzją a czułością wśród testowanych modeli nadzorowanych.
-3. **Kluczowe okazały się cechy kontekstowe** — sam koszt nie wystarczy do identyfikacji anomalii; niezbędne jest uwzględnienie historycznych trendów, środowiska i typu usługi.
-4. **Pułapka dokładności** (*accuracy trap*) potwierdzona eksperymentalnie — model baseline osiąga ~93% accuracy przy zerowym wykrywaniu anomalii.
-5. **Projekt łączy kompetencje Data Science i Cloud Engineering**, demonstrując zastosowanie ML w praktycznym problemie zarządzania kosztami chmury.
+2. **Las Losowy osiągnął najlepszy balans** między precyzją a czułością wśród testowanych modeli nadzorowanych: accuracy **0.9841**, precision **0.8857**, recall **0.8857**, F1 **0.8857** oraz ROC-AUC **0.9863**.
+3. **Regresja Logistyczna osiągnęła najwyższy recall** wśród modeli nadzorowanych (**0.9429**), ale kosztem niższej precyzji (**0.7765**) w porównaniu z Lasem Losowym.
+4. **Kluczowe okazały się cechy kontekstowe** — sam koszt nie wystarczy do identyfikacji anomalii; niezbędne jest uwzględnienie historycznych trendów, środowiska i typu usługi.
+5. **Pułapka dokładności** (*accuracy trap*) potwierdzona eksperymentalnie — model baseline osiąga **0.9306 accuracy** przy zerowym wykrywaniu anomalii.
+6. **Projekt łączy kompetencje Data Science i Cloud Engineering**, demonstrując zastosowanie ML w praktycznym problemie zarządzania kosztami chmury.
 
 ### Potencjalne rozszerzenia
 
@@ -191,4 +192,4 @@ System mógłby funkcjonować w środowisku produkcyjnym firmy według następuj
 
 ---
 
-**Repozytorium:** github.com/[team]/cloud-cost-anomaly-detection
+**Repozytorium:** https://github.com/maksimIvanouski/Cloud_Cost_Anomaly_Detection

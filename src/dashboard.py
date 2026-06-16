@@ -32,7 +32,6 @@ from src.predict import create_sample_record, predict_anomaly, print_suspicious_
 
 st.set_page_config(
     page_title="Cloud Cost Anomaly Detection",
-    page_icon="☁️",
     layout="wide",
 )
 
@@ -54,7 +53,7 @@ def load_model(model_path):
     return joblib.load(model_path)
 
 
-st.sidebar.title("☁️ Cloud Cost Anomaly Detection")
+st.sidebar.title("Cloud Cost Anomaly Detection")
 st.sidebar.markdown("---")
 page = st.sidebar.radio(
     "Navigation",
@@ -68,7 +67,7 @@ st.sidebar.info(
 
 
 if page == "Dataset Overview":
-    st.title("📊 Dataset Overview")
+    st.title("Dataset Overview")
     st.markdown("Explore the raw cloud cost dataset used for training and evaluation.")
 
     df = load_raw_data()
@@ -100,7 +99,7 @@ if page == "Dataset Overview":
 
 
 elif page == "Cost Analysis":
-    st.title("💰 Cost Analysis")
+    st.title("Cost Analysis")
 
     df = load_raw_data()
     if df is None:
@@ -166,7 +165,7 @@ elif page == "Cost Analysis":
 
 
 elif page == "Model Results":
-    st.title("🏆 Model Results")
+    st.title("Model Results")
     st.markdown("Comparison of all trained models on the test set.")
 
     st.subheader("Confusion Matrices")
@@ -209,7 +208,7 @@ elif page == "Model Results":
 
 
 elif page == "Predict":
-    st.title("🔮 Predict Anomaly")
+    st.title("Predict Anomaly")
     st.markdown("Enter cloud cost details to check if a record is anomalous.")
 
     with st.form("prediction_form"):
@@ -243,7 +242,7 @@ elif page == "Predict":
             rolling_3_day_avg = st.number_input("Rolling 3-Day Avg Cost", value=410.0, step=10.0)
             rolling_7_day_avg = st.number_input("Rolling 7-Day Avg Cost", value=405.0, step=10.0)
 
-        submitted = st.form_submit_button("🔍 Predict", use_container_width=True)
+        submitted = st.form_submit_button("Predict", use_container_width=True)
 
     if submitted:
         record_df = create_sample_record(
@@ -274,9 +273,9 @@ elif page == "Predict":
             st.markdown("---")
 
             if prediction == 1:
-                st.error("🚨 **ANOMALY DETECTED**")
+                st.error("**ANOMALY DETECTED**")
             else:
-                st.success("✅ **NORMAL** — No anomaly detected")
+                st.success("**NORMAL** — No anomaly detected")
 
             mcol1, mcol2, mcol3 = st.columns(3)
             mcol1.metric("Prediction", "ANOMALY" if prediction == 1 else "NORMAL")
@@ -286,7 +285,7 @@ elif page == "Predict":
                          f"{record_dict.get('cost_to_rolling_7_day_ratio', 0):.2f}x")
 
             if indicators:
-                st.subheader("⚠️ Suspicious Indicators")
+                st.subheader("Suspicious Indicators")
                 for ind in indicators:
                     st.warning(f"• {ind}")
             else:
