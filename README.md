@@ -438,7 +438,8 @@ cloud-cost-anomaly-detection/
 │   ├── screenshots/
 │   └── architecture/
 ├── reports/
-│   └── report_pl.md
+│   |__ report_pl.md
+│   
 ├── requirements.txt
 ├── README.md
 ├── Dockerfile
